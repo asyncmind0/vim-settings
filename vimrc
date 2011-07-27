@@ -58,21 +58,22 @@ set grepprg=grep\ -nH\ $*
 set iskeyword+=:
 set nonumber
 set tags=$OCRICKET/TAGS,$HOME/www/padikuin/src,$HOME/www/stevenjoseph/src,$HOME/www/virt/lib/python2.6/site-packages/tornado/
-set cursorline
-set cursorcolumn
+"set cursorline
+"set cursorcolumn
 set t_Co=256 
 set incsearch " jumps to search word as you type (annoying but excellent)
 set wildignore=*.o,*.obj,*.bak,*.exe
 "syn on
 set fdm=syntax
 set confirm
+set backspace=2
 
  
 filetype indent on
 filetype plugin on
 filetype on
 "color koehler
-color blackboard
+"color blackboard
 
 ""Python Support
 ""http://blog.sontek.net/2008/05/11/python-with-a-modular-ide-vim/
@@ -152,7 +153,7 @@ augroup END
 filetype plugin indent on
 syntax on
 "colorscheme tango
-"colorscheme ir_black
+colorscheme ir_black
 highlight cursorcolumn term=none cterm=none ctermbg=0233 guibg=#090909
 highlight cursorline term=NONE cterm=NONE ctermbg=0233 guibg=#090909
 highlight Folded term=none cterm=none ctermbg=0233 guibg=#090909
@@ -185,3 +186,5 @@ set ts=4
 highlight OverLength ctermbg=darkgrey ctermfg=white guibg=#592929
 match OverLength /\%81v.\+/
 
+let loaded_matchparen=1
+set colorcolumn=80
