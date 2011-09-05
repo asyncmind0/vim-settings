@@ -43,6 +43,8 @@ python << EOF
 import os
 import sys
 import vim
+sys.path.append("/home/steven/www/xplan/src/py")
+sys.path.append("/home/steven/www/xplan/data/wwwroot/js")
 for p in sys.path:
     if os.path.isdir(p):
         vim.command(r"set path+=%s" % (p.replace(" ", r"\ ")))
@@ -50,7 +52,8 @@ EOF
 
 " Generate tags with: ctags -R -f ~/.vim/tags/python24.ctags /usr/lib/python2.4/
 " ctrl-[ to go to the tag under the cursor, ctrl-T to go back.
-set tags+=$HOME/.vim/tags/python24.ctags
+"set tags+=$HOME/.vim/tags/python24.ctags
+set tags=tags;/
 
 " Use :make to see syntax errors. (:cn and :cp to move around, :dist to see
 " all errors)
@@ -72,19 +75,20 @@ python << EOF
 def SetBreakpoint():
     import re
     nLine = int( vim.eval( 'line(".")'))
+    import_line= "from debug import debug as sj_debug"
 
     strLine = vim.current.line
     strWhite = re.search( '^(\s*)', strLine).group(1)
 
     vim.current.buffer.append(
-       "%(space)sipdb.set_trace() %(mark)s Breakpoint %(mark)s" %
+       "%(space)ssj_debug() %(mark)s Breakpoint %(mark)s" %
          {'space':strWhite, 'mark': '#' * 30}, nLine - 1)
 
     for strLine in vim.current.buffer:
-        if strLine == "import ipdb":
+        if strLine == import_line:
             break
     else:
-        vim.current.buffer.append( 'import ipdb', 0)
+        vim.current.buffer.append( import_line, 0)
         vim.command( 'normal j1')
 
 vim.command( 'map <f7> :py SetBreakpoint()<cr>')
@@ -97,7 +101,7 @@ def RemoveBreakpoints():
     nLines = []
     nLine = 1
     for strLine in vim.current.buffer:
-        if strLine == "import ipdb" or strLine.lstrip()[:15] == "ipdb.set_trace()":
+        if strLine == "from debug import debug as sj_debug" or strLine.lstrip().startswith("sj_debug()") or strLine.lstrip().startswith("sj_trace()"):
             nLines.append( nLine)
         nLine += 1
 
@@ -111,5 +115,8 @@ def RemoveBreakpoints():
 
     vim.command( "normal %dG" % nCurrentLine)
 
-vim.command( "map <s-f7> :py RemoveBreakpoints()<cr>")
+vim.command( "map <f8> :py RemoveBreakpoints()<cr>")
 EOF
+
+map <buffer> <S-e> :w<CR>:!/usr/bin/env python % <CR>
+map <buffer> gd /def <C-R><C-W><CR> 

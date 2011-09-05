@@ -16,7 +16,7 @@ map <C-q> :conf bd
 map <silent><C-Left> <ESC>:bn<CR>
 map <silent><C-Right> <ESC>:bp<CR>
 noremap <silent> <F4> :NERDTreeToggle <CR>
-let NERDTreeWinPos="right"
+let NERDTreeWinPos="left"
 noremap <silent> <F3> :BufExplorer <CR>
 "noremap <silent> <C-@> :Project <CR>
 inoremap <Nul> <C-x><C-o>
@@ -25,8 +25,11 @@ noremap <silent> <F6> :QFix <CR>
 noremap <silent> ,c :Ack "//\ *TODO" <CR>
 noremap <silent> [1;5C <esc> :bn <CR>
 noremap <silent> [1;5D <esc> :bp <CR>
-nmap <silent> <F2> <Plug>ToggleProject
+"nmap <silent> <F2> <Plug>ToggleProject
+nnoremap <silent> <F2> :TlistToggle<CR>
 noremap `  :LustyFilesystemExplorer <CR>
+noremap <silent> cf :cs find c <C-R><C-W> <CR>
+set cscopequickfix=s-,c-,d-,i-,t-,e-
 set hidden
 
 "set term=ansi
@@ -57,7 +60,7 @@ set smartindent
 set grepprg=grep\ -nH\ $*
 set iskeyword+=:
 set nonumber
-set tags=$OCRICKET/TAGS,$HOME/www/padikuin/src,$HOME/www/stevenjoseph/src,$HOME/www/virt/lib/python2.6/site-packages/tornado/
+"set tags=$OCRICKET/TAGS,$HOME/www/padikuin/src,$HOME/www/stevenjoseph/src,$HOME/www/virt/lib/python2.6/site-packages/tornado/
 "set cursorline
 "set cursorcolumn
 set t_Co=256 
@@ -75,19 +78,8 @@ filetype on
 "color koehler
 "color blackboard
 
-""Python Support
-""http://blog.sontek.net/2008/05/11/python-with-a-modular-ide-vim/
-python << EOF
-import os
-import sys
-import vim
-for p in sys.path:
-	if os.path.isdir(p):
-		vim.command(r"set path+=%s" % (p.replace(" ", r"\ ")))
-EOF
-"With that snippet you will be able to go to your import statements and hit 'gf' on one of them and it'll jump you to that file.
 
-set tags+=$HOME/.vim/tags/python.ctags
+"set tags+=$HOME/.vim/tags/python.ctags
 autocmd FileType python set omnifunc=pythoncomplete#Complete
 inoremap <C-space> <C-x><C-o>
 syn match pythonError "^\s*def\s\+\w\+(.*)\s*$" display
@@ -159,7 +151,7 @@ highlight cursorline term=NONE cterm=NONE ctermbg=0233 guibg=#090909
 highlight Folded term=none cterm=none ctermbg=0233 guibg=#090909
 cabbr vdf vert diffsplit
 "map :vdf :vert diffsplit
-autocmd FileType java source /home/steven/vim/javakit/vim/JavaKit.vim
+"autocmd FileType java source /home/steven/vim/javakit/vim/JavaKit.vim
 map <C-J> <C-W>j<C-W>_
 map <C-K> <C-W>k<C-W>_
 set wmh=0
@@ -188,3 +180,19 @@ match OverLength /\%81v.\+/
 
 let loaded_matchparen=1
 set colorcolumn=80
+function! MoshBookmark()
+  redir >> ~/.vims
+  echo
+  echo strftime("%Y-%b-%d %a %H:%M")
+  echo "cd ". $PWD
+  echo "vim ". expand("%:p").':'.line('.')
+  echo ' word='.expand("<cword>")
+  echo ' cline='.getline('.')
+  redir END
+endfunction
+:command! MoshBookmark :call MoshBookmark()
+let NERDTreeMapActivateNode="<Right>"
+let NERDTreeMapCloseChildren="[DA"
+let NERDTreeMapCloseDir="<Left>"
+"set nu
+set ruler
