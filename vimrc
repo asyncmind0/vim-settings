@@ -196,9 +196,7 @@ let NERDTreeMapCloseChildren="[DA"
 let NERDTreeMapCloseDir="<Left>"
 "set nu
 set ruler
-set spell
-
-set spell spelllang=en_us
+"set spell spelllang=en_us
 " zg to add word to word list
 " " zw to reverse
 " " zug to remove word from word list
