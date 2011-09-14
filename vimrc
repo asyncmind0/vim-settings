@@ -29,6 +29,7 @@ noremap <silent> [1;5D <esc> :bp <CR>
 nnoremap <silent> <F2> :TlistToggle<CR>
 noremap `  :LustyFilesystemExplorer <CR>
 noremap <silent> cf :cs find c <C-R><C-W> <CR>
+noremap <silent> cd :cs find g <C-R><C-W> <CR>
 set cscopequickfix=s-,c-,d-,i-,t-,e-
 set hidden
 
