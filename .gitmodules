@@ -1,0 +1,18 @@
+[submodule "bundle/lusty"]
+	path = bundle/lusty
+	url = https://github.com/sjbach/lusty.git
+[submodule "bundle/bufexplorer"]
+	path = bundle/bufexplorer
+	url = https://github.com/corntrace/bufexplorer.git
+[submodule "bundle/vim-vividchalk"]
+	path = bundle/vim-vividchalk
+	url = https://github.com/tpope/vim-vividchalk.git
+[submodule "bundle/watchdog"]
+	path = bundle/watchdog
+	url = https://github.com/vim-scripts/watchdog.vim.git
+[submodule "bundle/pylint-mode"]
+	path = bundle/pylint-mode
+	url = git@github.com:jagguli/pylint-mode.git
+[submodule "bundle/ack"]
+	path = bundle/ack
+	url = https://github.com/vim-scripts/ack.vim.git
