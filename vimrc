@@ -75,8 +75,9 @@ hi Search term=reverse cterm=none ctermfg=Black ctermbg=Cyan gui=NONE guifg=Blac
 cabbr vdf vert diffsplit
 " More syntax highlighting.
 let python_highlight_all = 1
-
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Cscope settings
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 cs add ~/.vim/cscope.out
 cs add ./cscope.out
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
