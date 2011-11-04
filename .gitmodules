@@ -16,3 +16,12 @@
 [submodule "bundle/ack"]
 	path = bundle/ack
 	url = https://github.com/vim-scripts/ack.vim.git
+[submodule "bundle/command-t"]
+	path = bundle/command-t
+	url = https://github.com/wincent/Command-T.git
+[submodule "bundle/VimOrganizer"]
+	path = bundle/VimOrganizer
+	url = https://github.com/hsitz/VimOrganizer.git
+[submodule "bundle/vimcommander"]
+	path = bundle/vimcommander
+	url = https://github.com/vim-scripts/vimcommander.git

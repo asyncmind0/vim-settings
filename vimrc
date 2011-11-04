@@ -25,6 +25,8 @@ set laststatus=2
 set showcmd
 set hidden
 set hlsearch
+set equalalways
+set nowrap
 " Wrap at 72 chars for comments.
 set formatoptions=cq textwidth=72 foldignore= wildignore+=*.py[co]
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -57,6 +59,7 @@ noremap <silent> cd :cs find g <C-R><C-W> <CR>
 map <C-q> :conf bd <CR><CR>
 map <silent><A-Left> :bn!<CR>
 map <silent>[D :bp!<CR>
+map <leader>. :cn <CR>
 :command! CleanBlanks :%s/\ \+$//gc 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -102,56 +105,5 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  Python Stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" `gf` jumps to the filename under the cursor.  Point at an import statement
-" and jump to it!
-python << EOF
-import sys, os, vim
-sys.path.insert(0, 'src/py/')
-sys.path.insert(0, 'lib/py/')
-for p in sys.path:
-    if os.path.isdir(p):
-        vim.command(r"set path+=%s" % (p.replace(" ", r"\ ")))
-EOF
-
-" Use F7/Shift-F7 to add/remove a breakpoint (ipdb.set_trace)
-" Totally cool.
-python << EOF
-import vim
-def SetBreakpoint():
-    import re
-    nLine = int( vim.eval( 'line(".")'))
-    import_line= "from debug import debug as sj_debug"
-    strLine = vim.current.line
-    strWhite = re.search( '^(\s*)', strLine).group(1)
-    vim.current.buffer.append(
-       "%(space)ssj_debug() %(mark)s Breakpoint %(mark)s" %
-         {'space':strWhite, 'mark': '#' * 30}, nLine - 1)
-    for strLine in vim.current.buffer:
-        if strLine == import_line:
-            break
-    else:
-        vim.current.buffer.append( import_line, 0)
-        vim.command( 'normal j1')
-
-def RemoveBreakpoints():
-    import re
-    nCurrentLine = int( vim.eval( 'line(".")'))
-    nLines = []
-    nLine = 1
-    for strLine in vim.current.buffer:
-        if strLine == "from debug import debug as sj_debug" or \
-            strLine.lstrip().startswith("sj_debug()") or \
-            strLine.lstrip().startswith("sj_trace()"):
-            nLines.append( nLine)
-        nLine += 1
-    nLines.reverse()
-    for nLine in nLines:
-        vim.command( "normal %dG" % nLine)
-        vim.command( "normal dd")
-        if nLine < nCurrentLine:
-            nCurrentLine -= 1
-    vim.command( "normal %dG" % nCurrentLine)
-
-vim.command( 'map <f7> :py SetBreakpoint()<cr>')
-vim.command( "map <f8> :py RemoveBreakpoints()<cr>")
-EOF
+pyfile ~/.vim/pyvim.py
+let g:PyLintOnWrite = 0
