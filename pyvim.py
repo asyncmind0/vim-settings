@@ -85,6 +85,24 @@ def get_oscs():
                     print "http://osc.iress.com.au/view.php?id=%s Rev:%s by %s on %s" % \
                             (osc, log['revision'].number, log['author'],time.ctime(log['date']))
 
+def on_svn_diff():
+    cur_file = vim.current.line.split()[1]
+    if not os.path.isfile(cur_file):
+        print "Invalid file path"
+        return
+    client = pysvn.Client()
+    info = client.info(cur_file)
+    url = info['url']
+    revision = info['revision']
+    up_data = client.cat(url, revision=revision)
+    tmp_filename = os.path.join('/tmp',os.path.basename(cur_file))
+    with file(tmp_filename, 'w') as tmp_file:
+        tmp_file.write(up_data)
+    vim.command('tabnew %s' % cur_file)
+    vim.command('autocmd! BufWinLeave <buffer> :tabclose')
+    vim.command('vert diffsplit %s'%tmp_filename)
+    vim.command('autocmd! BufWinLeave <buffer> :tabclose')
+
 def on_svn_commit():
     print "Commiting"
     buffer = vim.current.buffer
@@ -123,24 +141,6 @@ def on_svn_commit():
         vim.command('bdelete!')
     except Exception as e:
         print e
-
-def on_svn_diff():
-    cur_file = vim.current.line.split()[1]
-    if not os.path.isfile(cur_file):
-        print "Invalid file path"
-        return
-    client = pysvn.Client()
-    info = client.info(cur_file)
-    url = info['url']
-    revision = info['revision']
-    up_data = client.cat(url, revision=revision)
-    tmp_filename = os.path.join('/tmp',os.path.basename(cur_file))
-    with file(tmp_filename, 'w') as tmp_file:
-        tmp_file.write(up_data)
-    vim.command('tabnew %s' % cur_file)
-    vim.command('autocmd! BufWinLeave <buffer> :tabclose')
-    vim.command('vert diffsplit %s'%tmp_filename)
-    vim.command('autocmd! BufWinLeave <buffer> :tabclose')
 
 def svn_commit():
     path = os.getcwd()
