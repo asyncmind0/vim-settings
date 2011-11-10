@@ -106,4 +106,5 @@ augroup END
 "  Python Stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 pyfile ~/.vim/pyvim.py
+pyfile ~/.vim/pysvnvim.py
 let g:PyLintOnWrite = 0
