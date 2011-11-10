@@ -1,0 +1,4 @@
+CFLAGS="-march=native -O2" ./configure --prefix=/usr/local  \
+--enable-rubyinterp  --enable-cscope --enable-sniff \
+--enable-multibyte --enable-fontset --enable-gui=gtk2 --enable-gtk2-check  --with-x  \
+--with-python-config-dir=/usr/lib/python2.7/config --enable-pythoninterp=yes
