@@ -2,7 +2,9 @@
 " General settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:netrw_list_hide= '^\..*'
+set term=rxvt
 set mouse=a
+set ttymouse=xterm2
 set cscopequickfix=s-,c-,d-,i-,t-,e-
 set hidden
 set softtabstop=4
