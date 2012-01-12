@@ -51,6 +51,10 @@ noremap <silent> <F4> :Explore! <CR><CR>
 noremap <silent> <F6> :QFix <CR>
 noremap `  :LustyFilesystemExplorer <CR>
 map <silent> <leader><cr> :noh<cr>
+" source $MYVIMRC reloads the saved $MYVIMRC
+:nmap <Leader>s :source ~/.vimrc
+" opens $MYVIMRC for editing, or use :tabedit $MYVIMRC
+:nmap <Leader>v :e ~/.vimrc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " command mappings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -70,7 +74,8 @@ call pathogen#helptags()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Color and highlighting stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-colorscheme ir_black
+"colorscheme ir_black
+colorscheme wombat
 highlight cursorcolumn term=none cterm=none ctermbg=0233 guibg=#090909
 highlight cursorline term=NONE cterm=NONE ctermbg=0233 guibg=#090909
 highlight Folded term=none cterm=none ctermbg=0233 guibg=#090909
@@ -108,3 +113,9 @@ augroup END
 pyfile ~/.vim/pyvim.py
 pyfile ~/.vim/pysvnvim.py
 let g:PyLintOnWrite = 0
+let g:xml_syntax_folding=1
+au FileType xml setlocal foldmethod=syntax
+
+au BufRead,BufNewFile *.scss set filetype=scss
+au BufRead,BufNewFile *.scss set filetype=scss
+let g:Tail_Center_Win = 1
