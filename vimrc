@@ -57,6 +57,17 @@ map <silent> <leader><cr> :noh<cr>
 :nmap <Leader>s :source ~/.vimrc
 " opens $MYVIMRC for editing, or use :tabedit $MYVIMRC
 :nmap <Leader>v :e ~/.vimrc
+" Convert slashes to backslashes for Windows.
+if has('win32')
+  nmap ,cs :let @*=substitute(expand("%"), "/", "\\", "g")<CR>
+  nmap ,cl :let @*=substitute(expand("%:p"), "/", "\\", "g")<CR>
+
+  " This will copy the path in 8.3 short format, for DOS and Windows 9x
+  nmap ,c8 :let @*=substitute(expand("%:p:8"), "/", "\\", "g")<CR>
+else
+  nmap ,cs :let @*=expand("%")<CR>
+  nmap ,cl :let @*=expand("%:p")<CR>
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " command mappings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -67,6 +78,7 @@ map <silent><A-Left> :bn!<CR>
 map <silent>[D :bp!<CR>
 map <leader>. :cn <CR>
 :command! CleanBlanks :%s/\ \+$//gc 
+:command! Suw :w !sudo tee %
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Patogen configuration
@@ -76,12 +88,15 @@ call pathogen#helptags()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Color and highlighting stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"colorscheme ir_black
-colorscheme wombat
+"set t_AB=<Esc>[48;5;%dm
+"set t_AF=<Esc>[38;5;%dm
+colorscheme ir_black
+"colorscheme wombat
 highlight cursorcolumn term=none cterm=none ctermbg=0233 guibg=#090909
 highlight cursorline term=NONE cterm=NONE ctermbg=0233 guibg=#090909
 highlight Folded term=none cterm=none ctermbg=0233 guibg=#090909
 hi Search term=reverse cterm=none ctermfg=Black ctermbg=Cyan gui=NONE guifg=Black guibg=Cyan
+hi ColorColumn ctermbg=232 guibg=lightgrey
 cabbr vdf vert diffsplit
 " More syntax highlighting.
 let python_highlight_all = 1

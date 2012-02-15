@@ -29,6 +29,7 @@ def RemoveBreakpoints():
     nCurrentLine = int( vim.eval( 'line(".")'))
     nLines = []
     nLine = 1
+    vim.command( "silent! %foldopen!")
     for strLine in vim.current.buffer:
         if strLine == "from debug import debug as sj_debug" or \
             strLine.lstrip().startswith("sj_debug()") or \
@@ -42,6 +43,7 @@ def RemoveBreakpoints():
         if nLine < nCurrentLine:
             nCurrentLine -= 1
     vim.command( "normal %dG" % nCurrentLine)
+    vim.command( "silent! foldclose!")
 
 def fix_commas():
     line  = vim.current.line
@@ -65,6 +67,18 @@ def fix_blanks():
                 del vim.current.buffer[v]
             dellines = []
 
+def edit_in_version(version=''):
+    filename = vim.current.buffer.name
+    filename = re.sub('xplan\d*','xplan%s' % version ,filename)
+    vim.command( ':e %s' % filename)
+
+def diff_version(version=''):
+    filename = vim.current.buffer.name
+    filename = re.sub('/iress/xplan\d*/','/iress/xplan%s/' % version ,filename)
+    vim.command( ':vert diffsplit %s' % filename)
+
+vim.command( 'command! -nargs=* DiffVersion :py diff_version(<args>)<cr>')
+vim.command( 'command! -nargs=* EditVersion :py edit_in_version(<args>)<cr>')
 vim.command( 'command! FixCommas :py fix_commas()<cr>')
 vim.command( 'command! FixBlanks :py fix_blanks()<cr>')
 vim.command( 'map <leader>f :py fix_commas()<cr>')

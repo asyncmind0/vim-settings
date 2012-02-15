@@ -3,11 +3,10 @@ import fileinput
 try :
     import pysvn
 except Exception as e:
-    pass
-    #vim.command("No svn support")
+    vim.command('echoerr "%s"' % str(e))
 else:
-    vim.command( 'command! OnSvnCommit :py on_svn_commit()<cr>')
-    vim.command( 'command! SvnCommit :py svn_commit()<cr>')
+    vim.command( 'command! -nargs=* OnSvnCommit :py on_svn_commit(<args>)<cr>')
+    vim.command( 'command! -nargs=* SvnCommit :py svn_commit(<args>)<cr>')
     vim.command( 'command! GetOsc :py get_oscs()<cr>')
     vim.command( 'command! GetAllOscs :py get_all_oscs()<cr>')
     vim.command( 'command! SvnLogFile :py svn_diff_versions()<cr>')
@@ -17,22 +16,21 @@ def on_svn_diff_multi():
     try:
         filename = vim.current.buffer[0]
         revisions = []
-        tempfilenames = []
         client = pysvn.Client()
         selection_found = False
         for line in vim.current.buffer:
             if line[0] == '*':
                 selection_found = True
-                rev,message = line.split()[:2]
-                revisions.append(pysvn.Revision(pysvn.opt_revision_kind.number,rev[1:-1]))
+                rev, message = line.split()[:2]
+                revisions.append(pysvn.Revision(pysvn.opt_revision_kind.number, rev[1:-1]))
         if not selection_found:
-                rev,message = vim.current.line.split()[:2]
-                revisions.append(pysvn.Revision(pysvn.opt_revision_kind.number,rev[:-1]))
+            rev, message = vim.current.line.split()[:2]
+            revisions.append(pysvn.Revision(pysvn.opt_revision_kind.number, rev[:-1]))
 
         if len(revisions) ==1:
-            _svn_diff(client, filename,revisions[0])
+            _svn_diff(client, filename, revisions[0])
         elif len(revisions)>1:
-            _svn_diff(client, filename,revisions[0], revisions[1])
+            _svn_diff(client, filename, revisions[0], revisions[1])
     except Exception as e:
         vim.command('echoerr "%s"' % str(e))
 
@@ -122,6 +120,7 @@ def get_all_oscs():
 
     except Exception as e:
         vim.command('echoerr "%s"' % str(e))
+
 def get_oscs():
     try:
         line  = vim.current.line
@@ -164,7 +163,7 @@ def _pre_commit_check(files):
     finput.close()
     return valid
 
-def on_svn_commit():
+def on_svn_commit(version=''):
     try:
         print "Commiting"
         buffer = vim.current.buffer
@@ -186,12 +185,15 @@ def on_svn_commit():
 
         commit_files = []
         commit_files_added = []
+        branches = []
         for line in buffer:
             if line.startswith('#M') or line.startswith('#D') or line.startswith('#A'):
                 commit_files.append(line[3:])
             elif line.startswith('#UA'):
                 commit_files.append(line[4:])
                 commit_files_added.append(line[4:])
+            if line.startswith('#BRANCHES'):
+                branches = line[len('#BRANCHES'):].split(',')
 
         if not _pre_commit_check(commit_files):
             print "File check failed"
@@ -202,8 +204,12 @@ def on_svn_commit():
             return
 
         client = pysvn.Client()
+        for p in commit_files:
+            revision2 = client.update(p)
         client.add(commit_files_added, recurse=False)
         revision = client.checkin(commit_files, commit_msg, recurse=False)
+        if branches:
+            svn_merge_branches(commit_msg,revision, commit_files, branches)
         print "Commited version %s" % str(revision)
         vim.command('bdelete!')
     except Exception as e:
@@ -234,6 +240,7 @@ def _svn_diff_new(client,filename,revision, revision2=None):
         vim.command( 'map :q :py _close_diff_tab("%s") <cr>'%tmp_filename)
     except Exception as e:
         vim.command('echoerr "%s"' % str(e))
+
 def _svn_diff(client,filename,revision, revision2=None):
     try:
         up_data = client.cat(filename, revision=revision)
@@ -279,9 +286,12 @@ def on_svn_revert():
     except Exception as e:
         vim.command('echoerr "%s"' % str(e))
 
-def svn_commit():
+def svn_commit(version=''):
     try:
         path = os.getcwd()
+        if version:
+            path = re.sub('xplan\d*','xplan%s' % version ,path)
+        os.chdir(path)
         vim.command('wa')
         for b in vim.buffers:
             if b.name == 'svn_commit':
@@ -291,7 +301,7 @@ def svn_commit():
         vim.command('set buftype=acwrite')
         vim.command('set bufhidden=hide')
         vim.command('setlocal noswapfile')
-        vim.command('autocmd! BufWriteCmd svn_commit :OnSvnCommit')
+        vim.command('autocmd! BufWriteCmd svn_commit :OnSvnCommit %s'%version)
         vim.command('autocmd! BufWinLeave svn_commit :bd! svn_commit')
         vim.current.buffer[0]='OSC:'
         vim.current.buffer.append('# Enter Commit Message Above ')
@@ -326,5 +336,23 @@ def svn_commit():
         vim.command( 'map <buffer> <leader>r :py on_svn_revert()<cr>')
     except Exception as e:
         vim.command('echoerr "%s"' % str(e))
+
+
+def svn_merge_branches(message, revision, files, branches):
+    try:
+        client = pysvn.Client()
+        for branch in branches:
+            branchpaths = []
+            for file in files:
+                path = re.sub('xplan\d*', 'xplan%s' % branch, file)
+                basedir = '/home/steven/iress/xplan'+branch
+                revision2 = client.update(path)
+                client.merge(file, revision, path, revision2[0], basedir)
+                branchpaths.append(path)
+            revision3 = client.checkin(branchpaths, message, recurse=False)
+            print "Commited version %s on branch %s" % (str(revision3), branch)
+    except Exception as e:
+        vim.command('echoerr "%s"' % str(e))
+
 
 
