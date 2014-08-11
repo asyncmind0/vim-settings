@@ -208,9 +208,9 @@ def on_svn_commit(version=''):
             revision2 = client.update(p)
         client.add(commit_files_added, recurse=False)
         revision = client.checkin(commit_files, commit_msg, recurse=False)
+        print "Commited version %s" % str(revision)
         if branches:
             svn_merge_branches(commit_msg,revision, commit_files, branches)
-        print "Commited version %s" % str(revision)
         vim.command('bdelete!')
     except Exception as e:
         vim.command('echoerr "%s"' % str(e))
@@ -340,15 +340,18 @@ def svn_commit(version=''):
 
 def svn_merge_branches(message, revision, files, branches):
     try:
-        client = pysvn.Client()
         for branch in branches:
+            branch = branch.strip()
             branchpaths = []
+            local_path = os.path.join('/home/steven/iress/xplan'+branch)
+            os.chdir(local_path)
+            client = pysvn.Client()
             for file in files:
                 path = re.sub('xplan\d*', 'xplan%s' % branch, file)
-                basedir = '/home/steven/iress/xplan'+branch
-                revision2 = client.update(path)
-                client.merge(file, revision, path, revision2[0], basedir)
+                revision2 = client.update(path)[0]
+                client.merge(file, revision,path,revision2,  local_path)
                 branchpaths.append(path)
+                vim.command('echo "%s"' % str(branchpaths))
             revision3 = client.checkin(branchpaths, message, recurse=False)
             print "Commited version %s on branch %s" % (str(revision3), branch)
     except Exception as e:

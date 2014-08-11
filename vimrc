@@ -30,7 +30,7 @@ set hlsearch
 set equalalways
 set nowrap
 " Wrap at 72 chars for comments.
-set formatoptions=cq textwidth=72 foldignore= wildignore+=*.py[co]
+set formatoptions=cq textwidth=0 foldignore= wildignore+=*.py[co]
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Filetype settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -51,6 +51,7 @@ noremap <silent> <F3> :BufExplorer <CR>
 noremap <silent> <S-F4> :Vex <CR><CR>
 noremap <silent> <F4> :Explore! <CR><CR>
 noremap <silent> <F6> :QFix <CR>
+noremap <silent> <S-F6> :QFix <CR>
 noremap `  :LustyFilesystemExplorer <CR>
 map <silent> <leader><cr> :noh<cr>
 " source $MYVIMRC reloads the saved $MYVIMRC
@@ -85,12 +86,34 @@ map <leader>. :cn <CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call pathogen#infect() 
 call pathogen#helptags()
+" To disable a plugin, add it's bundle name to the following list
+let g:pathogen_disabled = ["watchdog"]
+
+" for some reason the csscolor plugin is very slow when run on the terminal
+" but not in GVim, so disable it if no GUI is running
+if !has('gui_running')
+    call add(g:pathogen_disabled, 'csscolor')
+endif
+
+" Gundo requires at least vim 7.3
+if v:version < '703' || !has('python')
+    call add(g:pathogen_disabled, 'gundo')
+endif
+
+if v:version < '702'
+    call add(g:pathogen_disabled, 'autocomplpop')
+    call add(g:pathogen_disabled, 'fuzzyfinder')
+    call add(g:pathogen_disabled, 'l9')
+endif
+
+call pathogen#infect()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Color and highlighting stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "set t_AB=<Esc>[48;5;%dm
 "set t_AF=<Esc>[38;5;%dm
-colorscheme ir_black
+colorscheme tango2
+"colorscheme ir_black
 "colorscheme wombat
 highlight cursorcolumn term=none cterm=none ctermbg=0233 guibg=#090909
 highlight cursorline term=NONE cterm=NONE ctermbg=0233 guibg=#090909
@@ -114,6 +137,7 @@ command! -bang -nargs=? QFix call QFixToggle(<bang>0)
 function! QFixToggle(forced)
     if exists("g:qfix_win") && a:forced == 0
         cclose
+        lcl
     else
         execute "copen " . g:jah_Quickfix_Win_Height
     endif
@@ -136,3 +160,45 @@ au FileType xml setlocal foldmethod=syntax
 au BufRead,BufNewFile *.scss set filetype=scss
 au BufRead,BufNewFile *.scss set filetype=scss
 let g:Tail_Center_Win = 1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  window splits
+"  http://stackoverflow.com/questions/2586984/how-can-i-swap-positions-of-two-open-files-in-splits-in-vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! MarkWindowSwap()
+    let g:markedWinNum = winnr()
+endfunction
+
+function! DoWindowSwap()
+    "Mark destination
+    let curNum = winnr()
+    let curBuf = bufnr( "%" )
+    exe g:markedWinNum . "wincmd w"
+    "Switch to source and shuffle dest->source
+    let markedBuf = bufnr( "%" )
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' curBuf
+    "Switch to dest and shuffle source->dest
+    exe curNum . "wincmd w"
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' markedBuf 
+endfunction
+
+function! DoWindowSwapTwo()
+    "Mark destination
+    let curNum = winnr()
+    let curBuf = bufnr( "%" )
+    exe 2 . "wincmd w"
+    "Switch to source and shuffle dest->source
+    let markedBuf = bufnr( "%" )
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' curBuf
+    "Switch to dest and shuffle source->dest
+    exe curNum . "wincmd w"
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' markedBuf 
+endfunction
+nmap <silent> <leader>mw :call MarkWindowSwap()<CR>
+nmap <silent> <leader>pw :call DoWindowSwap()<CR>
+nmap <silent> <leader>sw :call DoWindowSwapTwo()<CR>
+set guifont=Inconsolata-dz\ for\ Powerline
+let g:Powerline_symbols = 'fancy'

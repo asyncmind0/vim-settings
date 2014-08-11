@@ -77,11 +77,20 @@ def diff_version(version=''):
     filename = re.sub('/iress/xplan\d*/','/iress/xplan%s/' % version ,filename)
     vim.command( ':vert diffsplit %s' % filename)
 
+def find_files(args):
+    try:
+        vim.command("set efm=%f")
+        vim.command("lgete system('/home/steven/iress/locate.sh %s')"%args)
+        vim.command("lopen")
+    except Exception as e:
+        vim.command('echoerr "%s"' % str(e))
+
+vim.command( 'command! -nargs=1 Find :py find_files("<args>")<cr>')
 vim.command( 'command! -nargs=* DiffVersion :py diff_version(<args>)<cr>')
 vim.command( 'command! -nargs=* EditVersion :py edit_in_version(<args>)<cr>')
 vim.command( 'command! FixCommas :py fix_commas()<cr>')
 vim.command( 'command! FixBlanks :py fix_blanks()<cr>')
 vim.command( 'map <leader>f :py fix_commas()<cr>')
-vim.command( 'map <f7> :py SetBreakpoint()<cr>')
-vim.command( "map <f8> :py RemoveBreakpoints()<cr>")
+vim.command( 'map <f8> :py SetBreakpoint()<cr>')
+vim.command( "map [32~ :py RemoveBreakpoints()<cr>")
 
